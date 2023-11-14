@@ -1,0 +1,45 @@
+name: Trigger auto deployment for container-app-4tut4t4au7d6y
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ main ]
+    paths:
+    - '**'
+    - '.github/workflows/container-app-4tut4t4au7d6y-AutoDeployTrigger-c187958b-1ff1-4d38-ba42-01a0b707d318.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.CONTAINERAPP4TUT4T4AU7D6Y_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.CONTAINERAPP4TUT4T4AU7D6Y_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.CONTAINERAPP4TUT4T4AU7D6Y_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: containerregistry4tut4t4au7d6y.azurecr.io
+          registryUsername: ${{ secrets.CONTAINERAPP4TUT4T4AU7D6Y_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.CONTAINERAPP4TUT4T4AU7D6Y_REGISTRY_PASSWORD }}
+          containerAppName: container-app-4tut4t4au7d6y
+          resourceGroup: msdocspythonflaskwebappquickstart89ce
+          imageToBuild: containerregistry4tut4t4au7d6y.azurecr.io/container-app-4tut4t4au7d6y:${{ github.sha }}
+          
+
+
